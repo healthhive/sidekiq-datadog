@@ -128,6 +128,3 @@ The base metric names `sidekiq.job` and `sidekiq.job_enqueued` can be overriden 
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Make a pull request
-
-
-**`dogstatsd-ruby` Version: `>= 5.0` **`
