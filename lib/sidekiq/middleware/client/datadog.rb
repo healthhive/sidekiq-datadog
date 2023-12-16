@@ -34,9 +34,11 @@ module Sidekiq
         def initialize(opts = {})
           statsd_host = opts[:statsd_host] || ENV.fetch('STATSD_HOST', 'localhost')
           statsd_port = (opts[:statsd_port] || ENV.fetch('STATSD_PORT', 8125)).to_i
+          statsd_single_thread = (opts[:statsd_single_thread] || ENV.fetch('STATSD_SINGLE_THREAD', false))
 
           @metric_name  = opts[:metric_name] || 'sidekiq.job_enqueued'
-          @statsd       = opts[:statsd] || ::Datadog::Statsd.new(statsd_host, statsd_port)
+          @statsd       = opts[:statsd] || ::Datadog::Statsd.new(statsd_host, statsd_port,
+                                                                 single_thread: statsd_single_thread)
 
           # `status` is meaningless when enqueueing
           skip_tags = Array(opts[:skip_tags]) + ['status']
