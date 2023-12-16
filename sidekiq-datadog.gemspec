@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.required_ruby_version = '>= 2.6'
 
-  s.add_runtime_dependency('dogstatsd-ruby', '>= 4.2.0')
+  s.add_runtime_dependency('dogstatsd-ruby', '>= 5.6.1')
   s.add_runtime_dependency('sidekiq', '>= 6.4.0')
 
   s.add_development_dependency('bundler')
