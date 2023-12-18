@@ -27,10 +27,15 @@ module Sidekiq
         def initialize(opts = {})
           statsd_host = opts[:statsd_host] || ENV.fetch('STATSD_HOST', 'localhost')
           statsd_port = (opts[:statsd_port] || ENV.fetch('STATSD_PORT', 8125)).to_i
+          statsd_single_thread = (opts[:statsd_single_thread] || ENV.fetch('STATSD_SINGLE_THREAD', false))
 
-          @metric_name  = opts[:metric_name] || 'sidekiq.job'
-          @statsd       = opts[:statsd] || ::Datadog::Statsd.new(statsd_host, statsd_port)
-          @tag_builder  = Sidekiq::Datadog::TagBuilder.new(
+          @metric_name = opts[:metric_name] || 'sidekiq.job'
+
+          @statsd = opts[:statsd] || ::Datadog::Statsd.new(statsd_host,
+                                                           statsd_port,
+                                                           single_thread: statsd_single_thread)
+
+          @tag_builder = Sidekiq::Datadog::TagBuilder.new(
             opts[:tags],
             opts[:skip_tags],
             opts[:hostname],
@@ -48,6 +53,8 @@ module Sidekiq
             record(worker, job, queue, start, clock, e)
             raise
           end
+        ensure
+          @statsd.close
         end
 
         private
@@ -63,8 +70,6 @@ module Sidekiq
 
           queued_ms = ((start - Time.at(job['enqueued_at'])) * 1000).round
           @statsd.timing "#{@metric_name}.queued_time", queued_ms, tags: tags
-
-          @statsd.flush if @statsd.respond_to?(:flush) # dogstatsd-ruby >= 5.0.0
         end
       end
     end

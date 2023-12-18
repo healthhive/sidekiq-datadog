@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     sidekiq-datadog (0.6.0)
-      dogstatsd-ruby (>= 5.6.0)
+      dogstatsd-ruby (>= 5.6.1)
       sidekiq (>= 6.4.0)
 
 GEM
