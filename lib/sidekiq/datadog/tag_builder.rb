@@ -4,8 +4,8 @@ module Sidekiq
       def initialize(custom_tags = [], skip_tags = [], custom_hostname = nil)
         @tags = Array(custom_tags)
         @skip_tags = Array(skip_tags).map(&:to_s)
-
-        env  = Sidekiq.options[:environment] || ENV.fetch('RACK_ENV', nil)
+        sidekiq_config = Sidekiq.respond_to?(:options) ? Sidekiq.options : Sidekiq.default_configuration
+        env  = sidekiq_config[:environment] || ENV.fetch('RACK_ENV', nil)
         host = custom_hostname || ENV.fetch('INSTRUMENTATION_HOSTNAME', Socket.gethostname)
         setup_defaults(host: host, env: env)
       end

@@ -67,7 +67,7 @@ module Sidekiq
           tags = @tag_builder.build_tags(worker_class, job, queue)
           @statsd.increment @metric_name, tags: tags
 
-          @statsd.flush if @statsd.respond_to?(:flush) # dogstatsd-ruby >= 5.0.0
+          @statsd.flush
         end
       end
     end

@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email         = ['tiagolnobre@gmail.com']
   s.description   = 'Datadog metrics for sidekiq'
   s.summary       = 'Datadog metrics for sidekiq'
-  s.homepage      = 'https://github.com/tiagolnobre/sidekiq-datadog'
+  s.homepage      = 'https://github.com/healthhive/sidekiq-datadog'
 
   s.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   s.executables   = s.files.grep(%r{^bin/}).map {|f| File.basename(f) }

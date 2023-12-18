@@ -3,6 +3,12 @@ sidekiq-datadog
 
 Datadog instrumentation for [Sidekiq](https://github.com/mperham/sidekiq), integrated via server middleware.
 
+Changes made from the original version:
+
+- Bump dogstatsd-ruby dependency to `>= 5.6.0`
+- Bump sidekiq dependency to `>= 6.4.0`
+- Support sidekiq 7 options configuration options
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -61,11 +67,13 @@ executed at runtime when the job is processed
       end
     end
 
-    # NOTE: Your lambda will either receive a `Worker` object for the Server middleware, 
-    # or a String with the `worker_class` for the Client middleware. 
+    # NOTE: Your lambda will either receive a `Worker` object for the Server middleware,
+    # or a String with the `worker_class` for the Client middleware.
+
     # If you are using that argument, your lambda should be able to handle both cases.
 
-You can supress some of the default tags from being emitted by passing in `skip_tags`. 
+You can supress some of the default tags from being emitted by passing in `skip_tags`.
+
 This is also useful if you would like to change one of the default tags, you can define
 a custom lambda **and** define it as `skip_tags`
 
@@ -73,7 +81,8 @@ a custom lambda **and** define it as `skip_tags`
     Sidekiq.configure_server do |config|
       config.server_middleware do |chain|
         chain.add(Sidekiq::Middleware::Server::Datadog,
-            skip_tags: ["name"], 
+            skip_tags: ["name"],
+
             tags: [->(worker_or_worker_class, job, queue, error){
                 "name:#{ my_logic_for_name }"
             }])
@@ -101,7 +110,8 @@ The client middleware will expose:
 - `sidekiq.job_enqueued` counter, with tags: `host`, `env`, `name` (the job name) and `queue`
 
 The server middleware will expose:
-- `sidekiq.job` counter, with tags: `host`, `env`, `name` (the job name), `queue`, 
+- `sidekiq.job` counter, with tags: `host`, `env`, `name` (the job name), `queue`,
+
     and `status` (`ok` or `error`). If `status` is `error`, there will be an additional
     `error` tag with the exception class.
 - `sidekiq.job.time` timing (`ms`) metric with the same tags, specifying the job runtime.
@@ -118,19 +128,3 @@ The base metric names `sidekiq.job` and `sidekiq.job_enqueued` can be overriden 
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Make a pull request
-
-
-**`dogstatsd-ruby` Version note:** `dogstatsd-ruby` has major backwards incompatibilities 
-between v4.8.3 and 5.0.0. This gem is compatible with both, and CI tests both versions.
-
-In order to test through both, we have 2 Gemfiles (and their respective `.lock` files):
-- `Gemfile`
-- `Gemfile_dogstats_v4`
-
-By default, everything runs against `dogstatsd-ruby` >= 5.0.
-
-To update `Gemfile_dogstats_v4.lock`, or run tests with c4.8:
-
-`BUNDLE_GEMFILE=Gemfile_dogstats_v4 bundle update`
-
-`BUNDLE_GEMFILE=Gemfile_dogstats_v4 bundle exec rspec`
