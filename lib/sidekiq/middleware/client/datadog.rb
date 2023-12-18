@@ -35,13 +35,11 @@ module Sidekiq
           statsd_host = opts[:statsd_host] || ENV.fetch('STATSD_HOST', 'localhost')
           statsd_port = (opts[:statsd_port] || ENV.fetch('STATSD_PORT', 8125)).to_i
           statsd_single_thread = (opts[:statsd_single_thread] || ENV.fetch('STATSD_SINGLE_THREAD', false))
-          statsd_buffer_max_pool_sized = (opts[:statsd_buffer_max_pool_size] || ENV.fetch('STATSD_BUFFER_MAX_POOL_SIZE', nil))
 
           @metric_name = opts[:metric_name] || 'sidekiq.job_enqueued'
 
           @statsd = opts[:statsd] || ::Datadog::Statsd.new(statsd_host,
                                                            statsd_port,
-                                                           buffer_max_pool_size: statsd_buffer_max_pool_sized,
                                                            single_thread: statsd_single_thread)
 
           # `status` is meaningless when enqueueing
@@ -58,7 +56,7 @@ module Sidekiq
           record(worker_class, job, queue)
           yield
         ensure
-          @statsd.close if @statsd.respond_to?(:close)
+          @statsd.close
         end
 
         private
@@ -66,8 +64,6 @@ module Sidekiq
         def record(worker_class, job, queue)
           tags = @tag_builder.build_tags(worker_class, job, queue)
           @statsd.increment @metric_name, tags: tags
-
-          @statsd.flush
         end
       end
     end
